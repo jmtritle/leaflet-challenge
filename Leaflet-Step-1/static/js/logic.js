@@ -9,8 +9,8 @@ var eMap = L.map("map", {
   L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
     attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
     maxZoom: 18,
-    id: "mapbox.light",
-    accessToken: "pk.eyJ1Ijoiam10cml0bGUiLCJhIjoiY2s4amM4aDhrMDFqYTNmcGZvN29xdGs5OCJ9.vhznuyA0w5Yc__sf_JKlew"
+    id: "mapbox.dark",
+    accessToken: API_KEY
   }).addTo(eMap);
   
   // storing the earthquake data as a link
@@ -32,7 +32,7 @@ d3.json(quakeLink, function(data) {
             fillColor: colorPicker(magnitude),
             fillOpacity: .80,
             radius: magnitude * 20000
-        }).bindPopup("<h3>Location: " + place + "</h3> <h3>Magnitude: " + magnitude + "</h3>").addTo(eMap);
+        }).bindPopup("<b>Location:</b> " + place + "<br><b>Magnitude:</b> " + magnitude).addTo(eMap);
     });
 });
 
@@ -46,3 +46,22 @@ function colorPicker(d) {
                    '#cae359';
 };
 
+// constructing the legend and placing it accordingly
+
+var mapLegend = L.control({
+    position: 'bottomright'
+});
+
+mapLegend.onAdd = function(map) {
+    var addDiv = L.DomUtil.create('div', 'legend'),
+    levels = [0, 1, 2, 3, 4, 5],
+    tags = [];
+
+    for (var i = 0; i < levels.length; i++) {
+        addDiv.innerHTML +=
+        '<i style="background:' + colorPicker(levels[i] + 1) + '">' + '<b>Mag - ' + levels[i] + ' > ' + (levels[i + 1] ? + levels[i + 1] + '</b> ||' : '+');
+    }
+    return addDiv;
+};
+
+mapLegend.addTo(eMap);
